@@ -1,4 +1,4 @@
-package Bank;
+package bank;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -25,6 +25,6 @@ public class DatabaseManager {
 	}
 	
 	public Connection getConnection() throws SQLException {
-		return DriverManager.getConnection("jdbc:mysql://mentok.se.rit.edu/cam3819", "cam3819", "Iphahfeek1");
+		return DriverManager.getConnection("jdbc:mysql://localhost/cam3819", "cam3819", "Iphahfeek1");
 	}
 }

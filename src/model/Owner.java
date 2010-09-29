@@ -6,16 +6,19 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 
-import Bank.DatabaseManager;
+import bank.DatabaseManager;
+
 
 public class Owner {
 	
+	private boolean loaded = false;
+
 	private int ownerID;
 	private String name;
 	
 	private boolean nameChanged = false;
 	
-	public void setOwnerID( int newOwnerID ) {
+	public void setOwnerID(int newOwnerID) {
 		ownerID = newOwnerID;
 	}
 	
@@ -41,7 +44,7 @@ public class Owner {
 		try {
 			Connection connection = DatabaseManager.getInstance().getConnection();
 			Statement statement = connection.createStatement();
-			String query = "SELECT id, name FROM owner";
+			String query = "SELECT ownerID, name FROM Owners";
 			if (where != null) {
 				query += " WHERE " + where;
 			}
@@ -49,14 +52,86 @@ public class Owner {
 			ResultSet rs = statement.getResultSet();
 			while (rs.next()) {
 				Owner o = new Owner();
+				o.loaded = true;
 				o.setOwnerID( rs.getInt("id"));
 				o.setName(rs.getString("name"));
 				owners.add(o);
 			}
+			rs.close();
+			statement.close();
+			connection.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 		return owners;
+	}
+	
+	public static ArrayList<Owner> findByAccount(CheckingAccount account) {
+		ArrayList<Owner> owners = new ArrayList<Owner>();
+		try {
+			Connection connection = DatabaseManager.getInstance().getConnection();
+			Statement statement = connection.createStatement();
+			String query = "SELECT Owners.ownerID, Owners.name FROM Owners,Owners_CheckingAccounts " +
+					"WHERE Owners_CheckingAccounts.ownerID = Owners.ownerID AND " +
+					"Owners_CheckingAccounts.checkingAccountID = " + account.getAccountID();
+			statement.executeQuery(query);
+			ResultSet rs = statement.getResultSet();
+			while (rs.next()) {
+				Owner o = new Owner();
+				o.loaded = true;
+				o.setOwnerID( rs.getInt("ownerID"));
+				o.setName(rs.getString("name"));
+				owners.add(o);
+			}
+			rs.close();
+			statement.close();
+			connection.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return owners;
+	}
+	
+	public void save() {
+		if (loaded) {
+			update();
+		} else {
+			insert();
+		}
+	}
+	
+	private void insert() {
+		if (!nameChanged) {
+			return;
+		}
+
+		try {
+			Connection connection = DatabaseManager.getInstance().getConnection();
+			Statement statement = connection.createStatement();
+			String query = "INSERT INTO Owners (name) VALUES('" + name + "')";
+			statement.executeUpdate(query);
+			statement.close();
+			connection.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private void update() {
+		if (!nameChanged) {
+			return;
+		}
+
+		try {
+			Connection connection = DatabaseManager.getInstance().getConnection();
+			Statement statement = connection.createStatement();
+			String query = "UPDATE Owners SET name = '" + name + "' WHERE ownerID = " + ownerID;
+			statement.executeUpdate(query);
+			statement.close();
+			connection.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 	}
 
 }
