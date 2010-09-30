@@ -2,16 +2,13 @@ package command;
 
 public abstract class Command {
 
-	private static int commandIDS = 1;
-
 	protected final String name;
 	protected final String help;
-	protected final int id;
+	protected int id;
 
 	public Command(String name, String help) {
 		this.name = name;
 		this.help = help;
-		this.id = commandIDS++;
 	}
 
 	public String getText() {

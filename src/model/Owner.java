@@ -35,8 +35,12 @@ public class Owner {
 		name = newName;
 	}
 	
-	public boolean isNameChanged() {
+	public boolean isChanged() {
 		return nameChanged;
+	}
+	
+	public static ArrayList<Owner> query() {
+		return query(null);
 	}
 	
 	public static ArrayList<Owner> query(String where) {
@@ -53,8 +57,8 @@ public class Owner {
 			while (rs.next()) {
 				Owner o = new Owner();
 				o.loaded = true;
-				o.setOwnerID( rs.getInt("id"));
-				o.setName(rs.getString("name"));
+				o.ownerID = rs.getInt("ownerID");
+				o.name = rs.getString("name");
 				owners.add(o);
 			}
 			rs.close();
@@ -79,8 +83,8 @@ public class Owner {
 			while (rs.next()) {
 				Owner o = new Owner();
 				o.loaded = true;
-				o.setOwnerID( rs.getInt("ownerID"));
-				o.setName(rs.getString("name"));
+				o.ownerID = rs.getInt("ownerID");
+				o.name = rs.getString("name");
 				owners.add(o);
 			}
 			rs.close();
@@ -101,7 +105,7 @@ public class Owner {
 	}
 	
 	private void insert() {
-		if (!nameChanged) {
+		if (!isChanged()) {
 			return;
 		}
 
@@ -109,7 +113,12 @@ public class Owner {
 			Connection connection = DatabaseManager.getInstance().getConnection();
 			Statement statement = connection.createStatement();
 			String query = "INSERT INTO Owners (name) VALUES('" + name + "')";
-			statement.executeUpdate(query);
+			statement.executeUpdate(query, Statement.RETURN_GENERATED_KEYS);
+			ResultSet rs = statement.getGeneratedKeys();
+			if (rs.first()) {
+				ownerID = rs.getInt(1);
+			}
+			rs.close();
 			statement.close();
 			connection.close();
 		} catch (SQLException e) {
@@ -118,7 +127,7 @@ public class Owner {
 	}
 	
 	private void update() {
-		if (!nameChanged) {
+		if (!isChanged()) {
 			return;
 		}
 
