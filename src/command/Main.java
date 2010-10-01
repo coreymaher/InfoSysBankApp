@@ -6,6 +6,7 @@ public class Main extends CommandList {
 		super("Main", "");
 
 		addCommand(new AddAccount());
+		addCommand(new AddTransaction());
 		addCommand(new Reports());
 		addCommand(new Exit());
 	}

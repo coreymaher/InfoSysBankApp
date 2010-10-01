@@ -7,6 +7,8 @@ public class Reports extends CommandList {
 		
 		addCommand(new List());
 		addCommand(new GreaterBalance());
+		addCommand(new Checks());
+		addCommand(new Transactions());
 		addCommand(new Back());
 	}
 

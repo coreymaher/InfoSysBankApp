@@ -9,9 +9,7 @@ import java.util.ArrayList;
 import bank.DatabaseManager;
 
 
-public class Owner {
-	
-	private boolean loaded = false;
+public class Owner extends Model {
 
 	private int ownerID;
 	private String name;
@@ -27,6 +25,7 @@ public class Owner {
 	}
 	
 	public String getName() {
+		loadData();
 		return name;
 	}
 	
@@ -37,6 +36,18 @@ public class Owner {
 	
 	public boolean isChanged() {
 		return nameChanged;
+	}
+	
+	@Override
+	protected void loadData() {
+		if (isLoaded()) {
+			return;
+		} else {
+			ArrayList<Owner> loadedOwners = Owner.query("ownerID = " + ownerID);
+			Owner loadedOwner = loadedOwners.get(0);
+			name = loadedOwner.name;
+			setIsLoaded();
+		}
 	}
 	
 	public static ArrayList<Owner> query() {
@@ -56,7 +67,7 @@ public class Owner {
 			ResultSet rs = statement.getResultSet();
 			while (rs.next()) {
 				Owner o = new Owner();
-				o.loaded = true;
+				o.setIsLoaded();
 				o.ownerID = rs.getInt("ownerID");
 				o.name = rs.getString("name");
 				owners.add(o);
@@ -82,7 +93,7 @@ public class Owner {
 			ResultSet rs = statement.getResultSet();
 			while (rs.next()) {
 				Owner o = new Owner();
-				o.loaded = true;
+				o.setIsLoaded();
 				o.ownerID = rs.getInt("ownerID");
 				o.name = rs.getString("name");
 				owners.add(o);
@@ -96,15 +107,7 @@ public class Owner {
 		return owners;
 	}
 	
-	public void save() {
-		if (loaded) {
-			update();
-		} else {
-			insert();
-		}
-	}
-	
-	private void insert() {
+	protected void insert() {
 		if (!isChanged()) {
 			return;
 		}
@@ -126,7 +129,7 @@ public class Owner {
 		}
 	}
 	
-	private void update() {
+	protected void update() {
 		if (!isChanged()) {
 			return;
 		}

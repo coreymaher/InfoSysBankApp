@@ -10,11 +10,9 @@ import java.util.ArrayList;
 import bank.DatabaseManager;
 
 
-public class CheckingAccount {
+public class CheckingAccount extends Model {
 	
 	private static final NumberFormat format = NumberFormat.getCurrencyInstance();
-	
-	private boolean loaded = false;
 
 	private int accountID;
 	private double balance;
@@ -23,6 +21,7 @@ public class CheckingAccount {
 	private boolean ownersChanged = false;
 	
 	private ArrayList<Owner> owners;
+	private ArrayList<Transaction> transactions;
 	
 	public int getAccountID() {
 		return accountID;
@@ -33,19 +32,23 @@ public class CheckingAccount {
 	}
 	
 	public double getBalance() {
+		loadData();
 		return balance;
 	}
 	
 	public String getFormattedBalance() {
+		loadData();
 		return format.format(balance);
 	}
 	
-	public void setBalance(Double newBalance) {
+	public void setBalance(double newBalance) {
+		loadData();
 		balanceChanged = true;
 		balance = newBalance;
 	}
 	
-	public void addBalance(Double additionalBalance) {
+	public void addBalance(double additionalBalance) {
+		loadData();
 		balanceChanged = true;
 		balance += additionalBalance;
 	}
@@ -69,6 +72,28 @@ public class CheckingAccount {
 		owners.add(owner);
 	}
 	
+	public ArrayList<Transaction> getTransactions(String andWhere) {
+		return Transaction.findByAccount(this, andWhere);
+	}
+	
+	public ArrayList<Transaction> getTransactions() {
+		if (transactions == null) {
+			transactions = Transaction.findByAccount(this);
+		}
+		return transactions;
+	}
+	
+	protected void loadData() {
+		if (isLoaded()) {
+			return;
+		} else {
+			ArrayList<CheckingAccount> loadedAccounts = CheckingAccount.query("accountID = " + accountID);
+			CheckingAccount loadedAccount = loadedAccounts.get(0);
+			balance = loadedAccount.balance;
+			setIsLoaded();
+		}
+	}
+
 	public static ArrayList<CheckingAccount> query() {
 		return query(null);
 	}
@@ -86,7 +111,7 @@ public class CheckingAccount {
 			ResultSet rs = statement.getResultSet();
 			while (rs.next()) {
 				CheckingAccount a = new CheckingAccount();
-				a.loaded = true;
+				a.setIsLoaded();
 				a.setAccountID( rs.getInt("accountID"));
 				a.setBalance(rs.getDouble("balance"));
 				checkingAccounts.add(a);
@@ -100,15 +125,7 @@ public class CheckingAccount {
 		return checkingAccounts;
 	}
 	
-	public void save() {
-		if (loaded) {
-			update();
-		} else {
-			insert();
-		}
-	}
-	
-	private void insert() {
+	protected void insert() {
 		if (!isChanged()) {
 			return;
 		}
@@ -134,7 +151,7 @@ public class CheckingAccount {
 		}
 	}
 	
-	private void update() {
+	protected void update() {
 		if (!isChanged()) {
 			return;
 		}
