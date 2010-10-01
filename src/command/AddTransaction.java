@@ -7,6 +7,11 @@ public class AddTransaction extends CommandList {
 		
 		addCommand(new AddDeposit());
 		addCommand(new AddCheck());
+		addCommand(new AddTransfer());
+		addCommand(new AddInterest());
+		addCommand(new AddCheckPrinting());
+		addCommand(new AddOverdraft());
+		addCommand(new AddWireTransfer());
 		addCommand(new Back());
 	}
 

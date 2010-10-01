@@ -24,7 +24,7 @@ public class Checks extends Command {
 			
 			ArrayList<Check> checks = Check.query("timestamp > date_sub(CURDATE(), INTERVAL" + days + " DAY");
 			for (Check check : checks) {
-				System.out.println(check.getTransactionID());
+				System.out.println(check);
 			}
 		}
 		return true;

@@ -101,6 +101,16 @@ public abstract class Transaction extends Model {
 					transactions.add(new Deposit(rs));
 				} else if (TransactionType.CHECK.getTransactionTypeID() == transactionTypeID) {
 					transactions.add(new Check(rs));
+				} else if (TransactionType.TRANSFER.getTransactionTypeID() == transactionTypeID) {
+					transactions.add(new Transfer(rs));
+				} else if (TransactionType.INTEREST.getTransactionTypeID() == transactionTypeID) {
+					transactions.add(new Interest(rs));
+				} else if (TransactionType.CHECKPRINTING.getTransactionTypeID() == transactionTypeID) {
+					transactions.add(new CheckPrinting(rs));
+				} else if (TransactionType.OVERDRAFT.getTransactionTypeID() == transactionTypeID) {
+					transactions.add(new Overdraft(rs));
+				} else if (TransactionType.WIRETRANSFER.getTransactionTypeID() == transactionTypeID) {
+					transactions.add(new WireTransfer(rs));
 				}
 			}
 			rs.close();

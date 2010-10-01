@@ -42,7 +42,6 @@ public class CheckingAccount extends Model {
 	}
 	
 	public void setBalance(double newBalance) {
-		loadData();
 		balanceChanged = true;
 		balance = newBalance;
 	}
